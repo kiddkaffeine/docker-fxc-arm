@@ -3,15 +3,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
 	&& apt-get install -y \
 # Required for building
-	&& apt-get install -y git \
+	&& apt-get install -y curl \
 	&& apt-get install -y clang \
 	&& apt-get install -y flex \
 	&& apt-get install -y bison \
 	&& apt-get install -y make \
 # Build and install wine
-	&& git clone git://source.winehq.org/git/wine.git \
-	&& cd wine \
-	&& git checkout tags/wine-6.22 \
+	&& curl -L "https://github.com/wine-mirror/wine/archive/refs/tags/wine-6.22.tar.gz" | tar xvz \
+	&& cd "wine-wine-6.22" \
 	&& export CC=clang \
 	&& export CXX=clang \
 	&& export CFLAGS="-std=gnu89 -g" \
@@ -28,8 +27,7 @@ RUN apt-get update \
 VOLUME /wine
 
 WORKDIR /fxc
-COPY D3DCompiler_47.dll .
-COPY fxc.exe .
+COPY D3DCompiler_47.dll fxc.exe ./
 
 # We do this to shut up the errors on first run. TODO: Is there a better way?
 RUN wine fxc.exe /?; exit 0
